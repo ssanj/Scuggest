@@ -12,8 +12,14 @@
 
 1. Search through directories. [x]
 1. Fuzzy matching on class names.
-    Prepared* -> java.sql.PreparedStatement
-    *Spec -> org.scalatest.{FlatSpec, FunSpec ...}
+    Prepared* -> java.sql.PreparedStatement [x]
+    *Spec -> org.scalatest.{FlatSpec, FunSpec ...} [x]
+    *Path* -> XYZPathDsl, SomethingPath, PathSomething [x]
+1. Fuzzy match should support nested class definitions
+1. separate out test from production dependencies => may need Scoggle paths
+1. specify packages to search through:
+    ammonite:Path,
+    scalatest: *Spec
 1. Support for nested class definitions: [x]
     net/ssanj/dabble/DabbleDslDef$FileExists$.class =>
      Should still find FileExits
