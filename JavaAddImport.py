@@ -12,7 +12,7 @@ def get_classes_list(path):
         classesList = []
         for root, dirs, files in os.walk(path):
             for filename in files:
-                classesList.append((root+"/"+filename)[len(path):])
+                classesList.append((root + os.sep + filename)[len(path):])
         return classesList
 
 class JavaAddImportCommand(sublime_plugin.TextCommand):
@@ -36,37 +36,32 @@ class JavaAddImportCommand(sublime_plugin.TextCommand):
             print("called with: " + className)
 
             for name in classesList:
-                if name.endswith("/"+className+".java") or   \
-                   name.endswith("/"+className+".scala") or  \
-                   name.endswith("\\"+className+".java") or  \
-                   name.endswith("\\"+className+".scala") or \
-                   name.endswith("/"+className+".class") or  \
-                   name.endswith("\\"+className+".class"):
-                    result = name.replace("/",".").replace("\\",".").replace(".java","").replace(".class", "")
+                if  name.endswith(os.sep + className + ".class"):
+                    result = name.replace(os.sep, ".").replace(".class", "")
                     if result.startswith("."):
                         result = result[1:]
                     results.append(result)
                 elif name.endswith("$" + className + "$.class"):
-                    result = name.replace("/",".").replace("\\",".").replace("$", ".").replace("..class", "")
+                    result = name.replace(os.sep, ".").replace("$", ".").replace("..class", "")
                     if result.startswith("."):
                         result = result[1:]
                     results.append(result)
                 elif className.startswith("*") and className.endswith("*") and name.find("$") == -1 and len(className) > 4:
-                     startIndex = name.rfind("/")
+                     startIndex = name.rfind ( os.sep )
                      endIndex = name.rfind(".")
                      toMatch = className[1:][:-1]
                      if startIndex != -1 and endIndex != -1 and \
                         (name.find(toMatch, startIndex - endIndex) != -1):
-                        result = name.replace("/",".").replace("\\",".").replace(".java", "").replace(".class", "")
+                        result = name.replace(os.sep, ".").replace(".class", "")
                         if result.startswith("."):
                             result = result[1:]
                         results.append(result)
                 elif className.endswith("*") and name.find("$") == -1 and len(className) > 4:
-                     startIndex = name.rfind("/") + 1
+                     startIndex = name.rfind ( os.sep )  + 1
                      toMatch = className[:-1]
                      if startIndex != -1 and \
                         (name.find(toMatch, startIndex, startIndex + len(toMatch)) != -1):
-                        result = name.replace("/",".").replace("\\",".").replace(".java", "").replace(".class", "")
+                        result = name.replace(os.sep, ".").replace(".class", "")
                         if result.startswith("."):
                             result = result[1:]
                         results.append(result)
@@ -75,7 +70,7 @@ class JavaAddImportCommand(sublime_plugin.TextCommand):
                      toMatch = className[1:]
                      if endIndex != -1 and \
                         (name.find(toMatch, endIndex - len(toMatch), endIndex) != -1):
-                        result = name.replace("/",".").replace("\\",".").replace(".java", "").replace(".class", "")
+                        result = name.replace(os.sep, ".").replace(".class", "")
                         if result.startswith("."):
                             result = result[1:]
                         results.append(result)
@@ -108,5 +103,5 @@ class JavaAddImportInsertCommand(sublime_plugin.TextCommand):
                 region = self.view.line(point)
                 line = self.view.substr(region)
                 if "import" in line or "class" in line:
-                    self.view.insert(edit,point,"import "+classpath+"\n")
+                    self.view.insert(edit,point,"import " + classpath + "\n")
                     break
