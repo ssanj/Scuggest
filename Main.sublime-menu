@@ -12,17 +12,17 @@
                 "children":
                 [
                     {
-                        "caption": "ScalaImports",
+                        "caption": "Scuggest",
                         "children":
                         [
                             {
                                 "command": "open_file",
-                                "args": {"file": "${packages}/ScalaImports/ScalaImports.sublime-settings"},
+                                "args": {"file": "${packages}/Scuggest/Scuggest.sublime-settings"},
                                 "caption": "Settings – Default"
                             },
                             {
                                 "command": "open_file",
-                                "args": {"file": "${packages}/User/ScalaImports.sublime-settings"},
+                                "args": {"file": "${packages}/User/Scuggest.sublime-settings"},
                                 "caption": "Settings – User"
                             },
                             { "caption": "-" },

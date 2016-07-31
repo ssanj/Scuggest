@@ -1,9 +1,9 @@
-SublimeScalaImports
+Scuggest
 ==================
 
-ScalaImports is a Sublime Text plugin for automatically adding imports to your Scala files. It resolves the package names by scanning through class files either in jar/zip files or in your target directories.
+Scuggest is a Sublime Text plugin for automatically adding imports to your Scala files. It resolves the package names by scanning through class files either in jar/zip files or in your target directories.
 
-ScalaImports was initially based on [JavaImports](https://github.com/MDeiml/SublimeJavaImports) but now works in a completely different way.
+Scuggest was initially based on [JavaImports](https://github.com/MDeiml/SublimeJavaImports) but now works in a completely different way.
 
 Installation
 ------------
