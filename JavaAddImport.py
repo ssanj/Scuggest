@@ -51,6 +51,16 @@ class JavaAddImportCommand(sublime_plugin.TextCommand):
                     if result.startswith("."):
                         result = result[1:]
                     results.append(result)
+                elif className.startswith("*") and className.endswith("*") and name.find("$") == -1 and len(className) > 4:
+                     startIndex = name.rfind("/")
+                     endIndex = name.rfind(".")
+                     toMatch = className[1:][:-1]
+                     if startIndex != -1 and endIndex != -1 and \
+                        (name.find(toMatch, startIndex - endIndex) != -1):
+                        result = name.replace("/",".").replace("\\",".").replace(".java", "").replace(".class", "")
+                        if result.startswith("."):
+                            result = result[1:]
+                        results.append(result)
                 elif className.endswith("*") and name.find("$") == -1 and len(className) > 4:
                      startIndex = name.rfind("/") + 1
                      toMatch = className[:-1]
@@ -60,7 +70,15 @@ class JavaAddImportCommand(sublime_plugin.TextCommand):
                         if result.startswith("."):
                             result = result[1:]
                         results.append(result)
-
+                elif className.startswith("*") and name.find("$") == -1 and len(className) > 4:
+                     endIndex = name.rfind(".")
+                     toMatch = className[1:]
+                     if endIndex != -1 and \
+                        (name.find(toMatch, endIndex - len(toMatch), endIndex) != -1):
+                        result = name.replace("/",".").replace("\\",".").replace(".java", "").replace(".class", "")
+                        if result.startswith("."):
+                            result = result[1:]
+                        results.append(result)
 
             def finishUp(index):
                 if index == -1:
