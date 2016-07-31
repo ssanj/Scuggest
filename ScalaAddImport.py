@@ -15,20 +15,20 @@ def get_classes_list(path):
                 classesList.append((root + os.sep + filename)[len(path):])
         return classesList
 
-class JavaAddImportCommand(sublime_plugin.TextCommand):
+class ScalaAddImportCommand(sublime_plugin.TextCommand):
     def run(self, edit):
         print("========> updated version")
         settings = self.view.settings()
-        if not settings.has("java_import_path"):
-            settings = sublime.load_settings("JavaImports.sublime-settings")
-            if not settings.has("java_import_path"):
-                sublime.error_message("You must first define \"java_import_path\" in your settings")
+        if not settings.has("scala_import_path"):
+            settings = sublime.load_settings("ScalaImports.sublime-settings")
+            if not settings.has("scala_import_path"):
+                sublime.error_message("You must first define \"scala_import_path\" in your settings")
                 return
-        if len(settings.get("java_import_path")) == 0:
-            sublime.error_message("You must first define \"java_import_path\" in your settings")
+        if len(settings.get("scala_import_path")) == 0:
+            sublime.error_message("You must first define \"scala_import_path\" in your settings")
             return
         classesList = []
-        for path in settings.get("java_import_path"):
+        for path in settings.get("scala_import_path"):
             classesList = classesList + get_classes_list(path)
 
         def onDone(className):
@@ -78,14 +78,14 @@ class JavaAddImportCommand(sublime_plugin.TextCommand):
             def finishUp(index):
                 if index == -1:
                     return
-                self.view.run_command("java_add_import_insert", {"classpath":results[index]})
+                self.view.run_command("scala_add_import_insert", {"classpath":results[index]})
 
             if len(results) == 1:
                 finishUp(0)
             elif len(results) > 1:
                 self.view.window().show_quick_panel(results, finishUp)
             else:
-                sublime.error_message("There is no such class in \"java_import_path\"")
+                sublime.error_message("There is no such class in \"scala_import_path\"")
 
         allEmpty = True
         for sel in self.view.sel():
@@ -96,7 +96,7 @@ class JavaAddImportCommand(sublime_plugin.TextCommand):
         if allEmpty:
             self.view.window().show_input_panel("Class name: ", "", onDone, None, None)
 
-class JavaAddImportInsertCommand(sublime_plugin.TextCommand):
+class ScalaAddImportInsertCommand(sublime_plugin.TextCommand):
         def run(self, edit, classpath):
             for i in range(0,10000):
                 point = self.view.text_point(i,0)

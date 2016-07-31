@@ -1,1 +1,1 @@
-{"platforms": ["*"], "version": "1.0.6", "sublime_text": "*", "description": "Sublime Text plugin for Java imports", "url": "https://github.com/MDeiml/SublimeJavaImports", "dependencies": []}
+{"platforms": ["*"], "version": "1.0.6", "sublime_text": "*", "description": "Sublime Text plugin for Scala imports", "url": "https://github.com/ssanj/???", "dependencies": []}

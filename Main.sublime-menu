@@ -12,17 +12,17 @@
                 "children":
                 [
                     {
-                        "caption": "JavaImports",
+                        "caption": "ScalaImports",
                         "children":
                         [
                             {
                                 "command": "open_file",
-                                "args": {"file": "${packages}/JavaImports/JavaImports.sublime-settings"},
+                                "args": {"file": "${packages}/ScalaImports/ScalaImports.sublime-settings"},
                                 "caption": "Settings – Default"
                             },
                             {
                                 "command": "open_file",
-                                "args": {"file": "${packages}/User/JavaImports.sublime-settings"},
+                                "args": {"file": "${packages}/User/ScalaImports.sublime-settings"},
                                 "caption": "Settings – User"
                             },
                             { "caption": "-" },
