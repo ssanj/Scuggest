@@ -1,6 +1,7 @@
 import sublime, sublime_plugin
 import zipfile
 import os
+import re
 
 def get_classes_list(path):
     if path.endswith(".zip") or path.endswith(".jar"):
@@ -41,9 +42,11 @@ class ScuggestAddImportCommand(sublime_plugin.TextCommand):
             print("called with: " + className)
 
             for name in classesList:
+                # classes that end with className. Eg: java.util.UUID
                 if  name.endswith("/" + className + ".class"):
                     result = name.replace("/", ".").replace(".class", "")
                     addResults(results, result)
+                # nested className. Eg: Outer.className
                 elif name.endswith("$" + className + "$.class"):
                     result = name.replace("/", ".").replace("$", ".").replace("..class", "")
                     addResults(results, result)
@@ -69,6 +72,9 @@ class ScuggestAddImportCommand(sublime_plugin.TextCommand):
                         (name.find(toMatch, endIndex - len(toMatch), endIndex) != -1):
                         result = name.replace("/", ".").replace(".class", "")
                         addResults(results, result)
+                elif name.endswith("/" + className +"$.class"):
+                    result = name.replace("/", ".").replace("$.class", "._")
+                    addResults(results, result)
 
             def finishUp(index):
                 if index == -1:
