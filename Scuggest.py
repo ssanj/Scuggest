@@ -12,7 +12,7 @@ def get_classes_list(path):
         classesList = []
         for root, dirs, files in os.walk(path):
             for filename in files:
-                classesList.append((root + os.sep + filename)[len(path):])
+                classesList.append((root + "/" + filename)[len(path):])
         return classesList
 
 class ScuggestAddImportCommand(sublime_plugin.TextCommand):
@@ -29,50 +29,46 @@ class ScuggestAddImportCommand(sublime_plugin.TextCommand):
         classesList = []
         for path in settings.get("scuggest_import_path"):
             classesList = classesList + get_classes_list(path)
+            classesList = list(map(lambda x: x.replace("\\", "/"), classesList))
+
+        def addResults(results, result):
+            if result.startswith("."):
+                result = result[1:]
+            results.append(result)
 
         def onDone(className):
             results = []
             print("called with: " + className)
 
             for name in classesList:
-                if  name.endswith(os.sep + className + ".class"):
-                    result = name.replace(os.sep, ".").replace(".class", "")
-                    if result.startswith("."):
-                        result = result[1:]
-                    results.append(result)
+                if  name.endswith("/" + className + ".class"):
+                    result = name.replace("/", ".").replace(".class", "")
+                    addResults(results, result)
                 elif name.endswith("$" + className + "$.class"):
-                    result = name.replace(os.sep, ".").replace("$", ".").replace("..class", "")
-                    if result.startswith("."):
-                        result = result[1:]
-                    results.append(result)
+                    result = name.replace("/", ".").replace("$", ".").replace("..class", "")
+                    addResults(results, result)
                 elif className.startswith("*") and className.endswith("*") and name.find("$") == -1 and len(className) > 4:
-                     startIndex = name.rfind ( os.sep )
+                     startIndex = name.rfind ( "/" )
                      endIndex = name.rfind(".")
                      toMatch = className[1:][:-1]
                      if startIndex != -1 and endIndex != -1 and \
                         (name.find(toMatch, startIndex - endIndex) != -1):
-                        result = name.replace(os.sep, ".").replace(".class", "")
-                        if result.startswith("."):
-                            result = result[1:]
-                        results.append(result)
+                        result = name.replace("/", ".").replace(".class", "")
+                        addResults(results, result)
                 elif className.endswith("*") and name.find("$") == -1 and len(className) > 4:
-                     startIndex = name.rfind ( os.sep )  + 1
+                     startIndex = name.rfind ( "/" )  + 1
                      toMatch = className[:-1]
                      if startIndex != -1 and \
                         (name.find(toMatch, startIndex, startIndex + len(toMatch)) != -1):
-                        result = name.replace(os.sep, ".").replace(".class", "")
-                        if result.startswith("."):
-                            result = result[1:]
-                        results.append(result)
+                        result = name.replace("/", ".").replace(".class", "")
+                        addResults(results, result)
                 elif className.startswith("*") and name.find("$") == -1 and len(className) > 4:
                      endIndex = name.rfind(".")
                      toMatch = className[1:]
                      if endIndex != -1 and \
                         (name.find(toMatch, endIndex - len(toMatch), endIndex) != -1):
-                        result = name.replace(os.sep, ".").replace(".class", "")
-                        if result.startswith("."):
-                            result = result[1:]
-                        results.append(result)
+                        result = name.replace("/", ".").replace(".class", "")
+                        addResults(results, result)
 
             def finishUp(index):
                 if index == -1:
@@ -101,6 +97,9 @@ class ScuggestAddImportInsertCommand(sublime_plugin.TextCommand):
                 point = self.view.text_point(i,0)
                 region = self.view.line(point)
                 line = self.view.substr(region)
-                if "import" in line or "class" in line:
+                if line.startswith("import ") or \
+                   line.startswith("class ") or \
+                   line.startswith("trait ") or \
+                   line.startswith("object "):
                     self.view.insert(edit,point,"import " + classpath + "\n")
                     break
