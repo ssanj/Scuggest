@@ -88,11 +88,13 @@ class ScuggestAddImportCommand(sublime_plugin.TextCommand):
                             print("prefix: " + prefix)
                             print("segments: " + str(segments))
                             print("name: " + name)
-                            addResults(results, prefix.replace("/", ".") + ".".join(segments))
-
-                # elif name.endswith("/" + className +"$.class"):
-                #     result = name.replace("/", ".").replace("$.class", "._")
-                #     addResults(results, result)
+                            result = prefix.replace("/", ".") + ".".join(segments)
+                            addResults(results, result)
+                            # if it's a parent then add ._
+                            if (segments[-1] != className):
+                                valueIndex = segments.index(className) + 1
+                                wildcard = ".".join(segments[:valueIndex]) + "._"
+                                addResults(results, prefix.replace("/", ".") + wildcard)
 
             def finishUp(index):
                 if index == -1:
