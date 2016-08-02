@@ -72,15 +72,34 @@ class ScuggestAddImportCommand(sublime_plugin.TextCommand):
                         (name.find(toMatch, endIndex - len(toMatch), endIndex) != -1):
                         result = name.replace("/", ".").replace(".class", "")
                         addResults(results, result)
-                elif name.endswith("/" + className +"$.class"):
-                    result = name.replace("/", ".").replace("$.class", "._")
-                    addResults(results, result)
+                elif ((len(re.findall(r"/"   + className + "\$.+\.class", name)) != 0) or \
+                      (len(re.findall(r"/(.+\$)" + className + "(\$.+)*\.class", name)))) and \
+                      name.rfind("$$anonfun$") == -1:
+                    startIndex = name.rfind("/") + 1
+                    length = len(name) - len(".class")
+                    evaluate = name[startIndex: length]
+                    prefix = name[:startIndex]
+
+                    # there are instances of className$class.class, so skip the extra class
+                    segments = [s for s in evaluate.split("$") if len(s) > 0 and s != "class"]
+
+                    for s in segments:
+                        if (s == className):
+                            print("prefix: " + prefix)
+                            print("segments: " + str(segments))
+                            print("name: " + name)
+                            addResults(results, prefix.replace("/", ".") + ".".join(segments))
+
+                # elif name.endswith("/" + className +"$.class"):
+                #     result = name.replace("/", ".").replace("$.class", "._")
+                #     addResults(results, result)
 
             def finishUp(index):
                 if index == -1:
                     return
                 self.view.run_command("scuggest_add_import_insert", {"classpath":results[index]})
 
+            results = sorted(list(set(results)))
             if len(results) == 1:
                 finishUp(0)
             elif len(results) > 1:
