@@ -15,7 +15,7 @@
     Prepared* -> java.sql.PreparedStatement [x]
     *Spec -> org.scalatest.{FlatSpec, FunSpec ...} [x]
     *Path* -> XYZPathDsl, SomethingPath, PathSomething [x]
-1. Fuzzy match should support nested class definitions
+1. Fuzzy match should support nested class definitions [x]
 1. separate out test from production dependencies => may need Scoggle paths
 1. specify packages to search through:
     ammonite:Path,
@@ -23,7 +23,9 @@
 1. Support for nested class definitions: [x]
     net/ssanj/dabble/DabbleDslDef$FileExists$.class =>
      Should still find FileExits
-        net.sanj.dabble.DabbleDslDef.FileExists
+        net.sanj.dabble.DabbleDslDef.FileExists [x]
 1. Auto add project class files
 1. Auto add project dependency jars files
 1. Auto add java src files
+1. Have a "fast" mode that exits after one match instead of applying all results
+1. Auto select word under cursor.

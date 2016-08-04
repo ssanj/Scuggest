@@ -111,15 +111,12 @@ class SuffixMatcher:
         Results.add(results, result)
 
 # example: /net/ssanj/dabble/DabblePathTypes.DabbleWorkPath.NestedDabbleWorkPath.MoreNestedDabbleWorkPath
-# search: DabbleWork
+# search: DabbleWorkPath
 # results:
-#  net.ssanj.dabble.DabblePathTypes
 #  net.ssanj.dabble.DabblePathTypes.DabbleWorkPath
 #  net.ssanj.dabble.DabblePathTypes.DabbleWorkPath.NestedDabbleWorkPath
 #  net.ssanj.dabble.DabblePathTypes.DabbleWorkPath.NestedDabbleWorkPath.MoreNestedDabbleWorkPath
-#  net.ssanj.dabble.DabblePathTypes._
 #  net.ssanj.dabble.DabblePathTypes.DabbleWorkPath._
-#  net.ssanj.dabble.DabblePathTypes.DabbleWorkPath.NestedDabbleWorkPath._
 class ObjectSubtypesMatcher:
 
     def name(self):
@@ -222,7 +219,13 @@ class ScuggestAddImportCommand(sublime_plugin.TextCommand):
         allEmpty = True
         for sel in self.view.sel():
             if sel.empty():
-                continue
+                wordSel  = self.view.word(sel)
+                wordContent = self.view.substr(wordSel)
+                if not wordSel.empty() and re.findall("^[a-zA-Z][a-zA-Z0-9]+$", wordContent):
+                    self.view.sel().add(wordSel)
+                    sel = wordSel
+                else:
+                    continue
             onDone(self.view.substr(sel))
             allEmpty = False
         if allEmpty:
@@ -234,9 +237,19 @@ class ScuggestAddImportInsertCommand(sublime_plugin.TextCommand):
                 point = self.view.text_point(i,0)
                 region = self.view.line(point)
                 line = self.view.substr(region)
-                if line.startswith("import ") or \
-                   line.startswith("class ") or \
-                   line.startswith("trait ") or \
-                   line.startswith("object "):
-                    self.view.insert(edit,point,"import " + classpath + "\n")
-                    break
+
+                # if not a single comment, block comment, package or package object or an empty line
+                # then insert import at the next line which should be some valid construct.
+                if not re.match("^[\s\t]*\/\*\*?[\s\t]*.*$", line) and \
+                   not re.match("^[\s\t]*\/\/.*$",  line) and \
+                   not re.match("^[\s\t]*package[\s\t]+(?:object)?(?:[\s\t]+)?[a-zA-Z][a-zA-Z0-9]+(?:\.(?:[a-zA-Z][a-zA-Z0-9]+))*$", line) and \
+                   not re.match("^[\s\t]*$", line):
+                       importStatement = "import " + classpath
+                       #if the previous line is also an import then just add above
+                       #if not then add an extra line to separate the import block
+                       if re.match("^[\s\t]*import[\s\t]+.*$", line):
+                         importStatementNL = importStatement + "\n"
+                       else:
+                         importStatementNL = importStatement + "\n\n"
+                       self.view.insert(edit, point, importStatementNL)
+                       break
