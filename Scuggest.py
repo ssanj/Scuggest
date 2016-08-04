@@ -66,77 +66,91 @@ class ContainsMatcher:
             result = filename.replace("/", ".").replace("$", ".").replace(".class", "")
             Results.add(results, result)
 
+# example: java.sql.PreparedStatement
+# search: Prepared*
 class PrefixMatcher:
 
     def name(self):
         return "prefix_matcher"
 
+    def is_wild_card(self, filename, className):
+        startIndex = filename.rfind ( "/" )  + 1
+        toMatch = className[:-1]
+        return startIndex != -1 and \
+               (filename.find(toMatch, startIndex, startIndex + len(toMatch)) != -1)
+
     def does_match(self, filename, className):
         return className.endswith("*") and \
-               filename.find("$") == -1 and \
-               len(className) > 4
+               len(className) > 4 and \
+               self.is_wild_card(filename, className)
 
-    def add_result(self, filename, results):
-        startIndex = name.rfind ( "/" )  + 1
-        toMatch = className[:-1]
-        if startIndex != -1 and \
-            (name.find(toMatch, startIndex, startIndex + len(toMatch)) != -1):
-            result = name.replace("/", ".").replace(".class", "")
-
+    def add_result(self, filename, className, results):
+        result = filename.replace("/", ".").replace("$", ".").replace(".class", "")
         Results.add(results, result)
 
+# example: java.time.ZonedDateTime
+# search *DateTime
 class SuffixMatcher:
 
     def name(self):
         return "suffix_matcher"
 
+    def is_wild_card(self, filename, className):
+        endIndex = filename.rfind(".")
+        toMatch  = className[1:]
+        return endIndex != -1 and \
+               (filename.find(toMatch, endIndex - len(toMatch), endIndex) != -1)
+
     def does_match(self, filename, className):
         return className.startswith("*") and \
-               name.find("$") == -1 and \
-               len(className) > 4
+               len(className) > 4 and \
+               self.is_wild_card(filename, className)
 
-    def add_result(self, filename, results):
-        endIndex = name.rfind(".")
-        toMatch = className[1:]
-        if endIndex != -1 and \
-            (name.find(toMatch, endIndex - len(toMatch), endIndex) != -1):
-            result = name.replace("/", ".").replace(".class", "")
-
+    def add_result(self, filename, className, results):
+        result = filename.replace("/", ".").replace("$", ".").replace(".class", "")
         Results.add(results, result)
 
+# example: /net/ssanj/dabble/DabblePathTypes.DabbleWorkPath.NestedDabbleWorkPath.MoreNestedDabbleWorkPath
+# search: DabbleWork
+# results:
+#  net.ssanj.dabble.DabblePathTypes
+#  net.ssanj.dabble.DabblePathTypes.DabbleWorkPath
+#  net.ssanj.dabble.DabblePathTypes.DabbleWorkPath.NestedDabbleWorkPath
+#  net.ssanj.dabble.DabblePathTypes.DabbleWorkPath.NestedDabbleWorkPath.MoreNestedDabbleWorkPath
+#  net.ssanj.dabble.DabblePathTypes._
+#  net.ssanj.dabble.DabblePathTypes.DabbleWorkPath._
+#  net.ssanj.dabble.DabblePathTypes.DabbleWorkPath.NestedDabbleWorkPath._
 class ObjectSubtypesMatcher:
 
     def name(self):
         return "object_subtypes_matcher"
 
     def does_match(self, filename, className):
-        return((len(re.findall(r"/"   + className + "\$.+\.class", name)) != 0) or \
-              (len(re.findall(r"/(.+\$)" + className + "(\$.+)*\.class", name)))) and \
-              name.rfind("$$anonfun$") == -1
+        return((len(re.findall(r"/"   + className + "\$.+\.class", filename)) != 0) or \
+              (len(re.findall(r"/(.+\$)" + className + "(\$.+)*\.class", filename))))
 
-    def add_result(self, filename, results):
-        startIndex = name.rfind("/") + 1
-        length = len(name) - len(".class")
-        evaluate = name[startIndex: length]
-        prefix = name[:startIndex]
+    def add_result(self, filename, className, results):
+        startIndex = filename.rfind("/") + 1
+        length     = len(filename) - len(".class")
+        evaluate   = filename[startIndex: length]
+        prefix     = filename[:startIndex].replace("/", ".")
 
         # there are instances of className$class.class, so skip the extra class
         segments = [s for s in evaluate.split("$") if len(s) > 0 and s != "class"]
 
         for s in segments:
             if (s == className):
-                print("prefix: " + prefix)
-                print("segments: " + str(segments))
-                print("name: " + name)
-                result = prefix.replace("/", ".") + ".".join(segments)
+                # print("prefix: " + prefix)
+                # print("segments: " + str(segments))
+                # print("filename: " + filename)
+                result = prefix + ".".join(segments)
                 Results.add(results, result)
 
                 # if it's a parent then add ._
                 if (segments[-1] != className):
                     valueIndex = segments.index(className) + 1
-                    wildcard = ".".join(segments[:valueIndex]) + "._"
-
-        Results.add(results, result)
+                    wildcard = prefix + ".".join(segments[:valueIndex]) + "._"
+                    Results.add(results, wildcard)
 
 def get_classes_list(path):
     if path.endswith(".zip") or path.endswith(".jar"):
@@ -175,14 +189,13 @@ class ScuggestAddImportCommand(sublime_plugin.TextCommand):
 
         def onDone(className):
             results = []
-            # prefixMatcher = PrefixMatcher()
-            # suffixMatcher = SuffixMatcher()
-            # objectSubtypesMatcher = ObjectSubtypesMatcher()
             matches = [EndsWithClassNameMatcher(), \
                        EndsWithObjectMatcher(),    \
-                       ContainsMatcher()]
+                       ContainsMatcher(),          \
+                       PrefixMatcher(),            \
+                       SuffixMatcher(),            \
+                       ObjectSubtypesMatcher()]
 
-            count = 0
             for name in classesList:
                 #skip classes created for functions
                 if(name.find("$$anonfun$") != -1):
@@ -190,7 +203,6 @@ class ScuggestAddImportCommand(sublime_plugin.TextCommand):
 
                 for m in matches:
                     if (m.does_match(name, className)):
-                        print("matched")
                         m.add_result(name, className, results)
                         break
 
