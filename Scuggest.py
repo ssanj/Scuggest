@@ -171,9 +171,12 @@ class ScuggestAddImportCommand(sublime_plugin.TextCommand):
             if not settings.has("scuggest_import_path"):
                 sublime.error_message("You must first define \"scuggest_import_path\" in your settings")
                 return
+
         if len(settings.get("scuggest_import_path")) == 0:
             sublime.error_message("You must first define \"scuggest_import_path\" in your settings")
             return
+        filtered_path = settings.get("scuggest_filtered_path") or []
+        print("filtered_path: " + str(filtered_path))
         classesList = []
         for path in settings.get("scuggest_import_path"):
             classesList = classesList + get_classes_list(path)
@@ -184,6 +187,12 @@ class ScuggestAddImportCommand(sublime_plugin.TextCommand):
                 result = result[1:]
             results.append(result)
 
+        def has_element(elements, f):
+            for e in elements:
+                if f(e):
+                    return True
+            return False
+
         def onDone(className):
             results = []
             matches = [EndsWithClassNameMatcher(), \
@@ -193,15 +202,23 @@ class ScuggestAddImportCommand(sublime_plugin.TextCommand):
                        SuffixMatcher(),            \
                        ObjectSubtypesMatcher()]
 
+            print("classesList: " + str(len(classesList)))
+            count = 0
             for name in classesList:
                 #skip classes created for functions
-                if(name.find("$$anonfun$") != -1):
+                if(name.find("$$anonfun$") != -1 or \
+                   name.find("$$anon$") != -1 or \
+                   re.match("^.*\$\d+\.class$", name) or\
+                   has_element(filtered_path, name.startswith)):
                     continue
 
+                count = count + 1
                 for m in matches:
                     if (m.does_match(name, className)):
                         m.add_result(name, className, results)
                         break
+
+            print("classes scanned: " + str(count))
 
             def finishUp(index):
                 if index == -1:
