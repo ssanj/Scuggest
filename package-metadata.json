@@ -1,1 +1,0 @@
-{"platforms": ["*"], "version": "1.0.6", "sublime_text": "*", "description": "Sublime Text plugin for Scala imports", "url": "https://github.com/ssanj/scuggest", "dependencies": []}
