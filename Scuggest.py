@@ -2,13 +2,19 @@ import sublime, sublime_plugin
 import re
 from .matchers import *
 from .tools import *
+from .momento import *
 
 class ScuggestAddImportCommand(sublime_plugin.TextCommand):
 
     def __init__(self, view):
         self.view = view
-        self.classes_list = []
-        self.path_hash = None
+        self.classes_list = Momento.classes_list
+        self.path_hash    = Momento.path_hash
+
+    def update_state(self, class_paths, classes_list):
+        Momento.set_classes_list(class_paths, classes_list)
+        self.classes_list = Momento.classes_list
+        self.path_hash    = Momento.path_hash
 
     def load_classes(self, classPaths):
         clazzList = []
@@ -35,8 +41,7 @@ class ScuggestAddImportCommand(sublime_plugin.TextCommand):
         print("filtered_path: " + str(filtered_path))
         print("path_hash: " + str(self.path_hash))
         if not self.classes_list or self.path_hash != md5(class_paths):
-            self.classes_list = timed("load_classes")(self.load_classes(class_paths))
-            self.path_hash    = md5(class_paths)
+            self.update_state(class_paths, timed("load_classes")(self.load_classes(class_paths)))
 
         self.process_classes(self.classes_list, filtered_path)
 
