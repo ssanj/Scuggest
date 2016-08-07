@@ -21,9 +21,10 @@ def has_element(elements, f):
             return True
     return False
 
-
-def timeit(name, fun):
-    start = pc()
-    f()
-    end = pc()
-    print(name + ": " + str(end - start) + "s")
+def timed(name):
+    start  = pc()
+    def with_function(result):
+        end = pc()
+        print(name + ": " + str(end - start) + "s")
+        return result
+    return with_function

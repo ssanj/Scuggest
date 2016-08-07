@@ -11,10 +11,9 @@ class ScuggestAddImportCommand(sublime_plugin.TextCommand):
             clazzList = clazzList + get_classes_list(path)
             clazzList = list(map(lambda x: x.replace("\\", "/"), clazzList))
 
-        self.classesList = clazzList
+        return clazzList
 
     def run(self, edit):
-        debug = True
         settings = self.view.settings()
         if not settings.has("scuggest_import_path"):
             settings = sublime.load_settings("Scuggest.sublime-settings")
@@ -26,32 +25,33 @@ class ScuggestAddImportCommand(sublime_plugin.TextCommand):
             sublime.error_message("You must first define at least one \"scuggest_import_path\" in your settings")
             return
 
-        self.filtered_path = settings.get("scuggest_filtered_path") or []
-        print("filtered_path: " + str(self.filtered_path))
-        self.load_classes(settings.get("scuggest_import_path"))
-        self.process_classes()
+        filtered_path = settings.get("scuggest_filtered_path") or []
+        print("filtered_path: " + str(filtered_path))
+        classesList = timed("load_classes")(self.load_classes(settings.get("scuggest_import_path")))
+        self.process_classes(classesList, filtered_path)
 
 
-    def process_classes(self):
+    def process_classes(self, classesList, filtered_path):
         allEmpty = True
         for sel in self.view.sel():
             if sel.empty():
-                wordSel  = self.view.word(sel)
+                wordSel     = self.view.word(sel)
                 wordContent = self.view.substr(wordSel)
                 if not wordSel.empty() and re.findall("^[a-zA-Z][a-zA-Z0-9]+$", wordContent):
                     self.view.sel().add(wordSel)
                     sel = wordSel
                 else:
                     continue
+
             userSelection = self.view.substr(sel)
-            self.process_classes_in_ui(userSelection)
+            self.process_classes_in_ui(classesList, filtered_path)(userSelection)
 
             allEmpty = False
 
         if allEmpty:
-            self.view.window().show_input_panel("Class name: ", "", self.process_classes_in_ui, None, None)
+            self.view.window().show_input_panel("Class name: ", "", self.process_classes_in_ui(classesList, filtered_path), None, None)
 
-    def match_selection(self, className):
+    def match_selection(self, classesList, filtered_path, userSelection):
         results = []
         matches = [EndsWithClassNameMatcher(), \
                    EndsWithObjectMatcher(),    \
@@ -60,41 +60,44 @@ class ScuggestAddImportCommand(sublime_plugin.TextCommand):
                    SuffixMatcher(),            \
                    ObjectSubtypesMatcher()]
 
-        print("classesList: " + str(len(self.classesList)))
+        print("classesList: " + str(len(classesList)))
         count = 0
-        for name in self.classesList:
+        for name in classesList:
             #skip classes created for functions
             if(name.find("$$anonfun$") != -1 or \
                name.find("$$anon$") != -1 or \
                re.match("^.*\$\d+\.class$", name) or\
-               has_element(self.filtered_path, name.startswith)):
+               has_element(filtered_path, name.startswith)):
                 continue
 
             count = count + 1
             for m in matches:
-                if (m.does_match(name, className)):
-                    m.add_result(name, className, results)
+                if (m.does_match(name, userSelection)):
+                    m.add_result(name, userSelection, results)
                     break
 
         print("classes scanned: " + str(count))
         return sorted(list(set(results)))
 
-    def process_classes_in_ui(self, userSelection):
-        results = self.match_selection(userSelection)
-        if len(results) == 1:
-            self.selectClass(results)(0)
-        elif len(results) > 1:
-            self.view.window().show_quick_panel(results, self.selectClass(results))
-        else:
-            sublime.error_message("There is no such class in \"scuggest_import_path\"")
+    def process_classes_in_ui(self, classesList, filtered_path):
+        def with_user_selection(userSelection):
+            results = timed("match_selection")(self.match_selection(classesList, filtered_path, userSelection))
+            if len(results) == 1:
+                self.select_class(results)(0)
+            elif len(results) > 1:
+                self.view.window().show_quick_panel(results, self.select_class(results))
+            else:
+                sublime.error_message("There is no such class in \"scuggest_import_path\"")
 
-    def selectClass(self, results):
-        def withIndex(index):
+        return with_user_selection
+
+    def select_class(self, results):
+        def with_index(index):
             if index == -1:
                 return
-            self.view.run_command("scuggest_add_import_insert", {"classpath":results[index]})
+            self.view.run_command("scuggest_add_import_insert", {"classpath": results[index]})
 
-        return withIndex
+        return with_index
 
 class ScuggestAddImportInsertCommand(sublime_plugin.TextCommand):
     def run(self, edit, classpath):
