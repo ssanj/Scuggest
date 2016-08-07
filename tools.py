@@ -1,6 +1,7 @@
 import zipfile
 import os
 from time import perf_counter as pc
+import hashlib
 
 def get_classes_list(path):
     if path.endswith(".zip") or path.endswith(".jar"):
@@ -28,3 +29,6 @@ def timed(name):
         print(name + ": " + str(end - start) + "s")
         return result
     return with_function
+
+def md5(content):
+    return hashlib.md5(str(content).encode("utf-8")).hexdigest()

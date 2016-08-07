@@ -5,6 +5,11 @@ from .tools import *
 
 class ScuggestAddImportCommand(sublime_plugin.TextCommand):
 
+    def __init__(self, view):
+        self.view = view
+        self.classes_list = []
+        self.path_hash = None
+
     def load_classes(self, classPaths):
         clazzList = []
         for path in classPaths:
@@ -26,9 +31,14 @@ class ScuggestAddImportCommand(sublime_plugin.TextCommand):
             return
 
         filtered_path = settings.get("scuggest_filtered_path") or []
+        class_paths   = settings.get("scuggest_import_path")
         print("filtered_path: " + str(filtered_path))
-        classesList = timed("load_classes")(self.load_classes(settings.get("scuggest_import_path")))
-        self.process_classes(classesList, filtered_path)
+        print("path_hash: " + str(self.path_hash))
+        if not self.classes_list or self.path_hash != md5(class_paths):
+            self.classes_list = timed("load_classes")(self.load_classes(class_paths))
+            self.path_hash    = md5(class_paths)
+
+        self.process_classes(self.classes_list, filtered_path)
 
 
     def process_classes(self, classesList, filtered_path):
