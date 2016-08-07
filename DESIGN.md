@@ -28,4 +28,7 @@
 1. Auto add project dependency jars files
 1. Auto add java src files
 1. Have a "fast" mode that exits after one match instead of applying all results
-1. Auto select word under cursor.
+1. Auto select word under cursor. [x]
+1. Load classes once per session or until classes list has been updated [x]
+1. externalise min class length
+1. An "explain" mode that explains what classes were consider and which matchers actually matched each one.
