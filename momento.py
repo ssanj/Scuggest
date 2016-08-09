@@ -20,21 +20,14 @@ class Momento:
         lock = threading.RLock()
         lock.acquire()
         try:
-            return Momento.cache.get(project_name)
+            result = Momento.cache.get(project_name)
+            if result:
+                return result
+            else:
+                return MomentoItem(project_name, [], "")
         except Exception as e:
             print("Could not update cache due to: " + e)
-            return None
-        finally:
-            lock.release()
-
-    def set_classes_list(class_paths, classes_list):
-        lock = threading.RLock()
-        lock.acquire()
-        try:
-            Momento.classes_list = classes_list
-            Momento.path_hash    = md5(class_paths)
-        except Exception as e:
-            print("Could not update classes_list due to: " + e)
+            return MomentoItem(project_name, [], "")
         finally:
             lock.release()
 
@@ -52,8 +45,8 @@ class MomentoItem:
                  }
                }
 
-    def should_refresh(self, current_jar_files_path_hash):
+    def should_refresh(self, current_jar_files_path):
         return (not self.classes_from_jars) or \
-                self.jar_files_path_hash != md5(current_jar_files_path_hash)
+                self.jar_files_path_hash != md5(current_jar_files_path)
 
 

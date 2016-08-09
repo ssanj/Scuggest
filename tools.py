@@ -16,6 +16,14 @@ def get_classes_list(path):
                 classesList.append((root + "/" + filename)[len(path):])
         return classesList
 
+def load_classes(class_paths):
+    clazzList = []
+    for path in class_paths:
+        clazzList = clazzList + get_classes_list(path)
+        clazzList = list(map(lambda x: x.replace("\\", "/"), clazzList))
+
+    return clazzList
+
 def partition_file_paths(file_paths):
     from_dirs = []
     from_jars = []
