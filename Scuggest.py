@@ -7,9 +7,22 @@ from .momento import *
 class ScuggestAddImportCommand(sublime_plugin.TextCommand):
 
     def __init__(self, view):
-        self.view = view
-        self.classes_list = Momento.classes_list
-        self.path_hash    = Momento.path_hash
+        print("-- ScuggestAddImportCommand -- ")
+        project_name = get_project_name(view)
+        if (project_name):
+            self.view = view
+            self.classes_list = Momento.classes_list
+            self.path_hash    = Momento.path_hash
+        else:
+            print("Could not read .sublime-project file." +
+                  "\nCreate a project and add your Scuggest settings there." +
+                  "\nPlease see https://github.com/ssanj/Scuggest for more information.")
+
+    def is_enabled(self):
+        return is_expected_env(self.view, sublime.version())
+
+    def is_visible(self):
+        return is_expected_env(self.view, sublime.version())
 
     def update_state(self, class_paths, classes_list):
         Momento.set_classes_list(class_paths, classes_list)

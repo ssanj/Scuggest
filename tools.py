@@ -32,3 +32,22 @@ def timed(name):
 
 def md5(content):
     return hashlib.md5(str(content).encode("utf-8")).hexdigest()
+
+def get_project_name(view):
+    if view and view.window():
+        return view.window().project_file_name()
+    else:
+        return ""
+
+def is_expected_env(view, version):
+    if get_project_name(view) and \
+       view and \
+       view.settings() and \
+       view.settings().has("syntax"):
+        syntax = view.settings().get('syntax')
+        if (int(version) <= 3083):
+            return syntax.endswith("Scala.tmLanguage")
+        else:
+            return syntax.endswith("Scala.sublime-syntax")
+    else:
+        return False
