@@ -4,7 +4,7 @@ from time import perf_counter as pc
 import hashlib
 
 def get_classes_list(path):
-    if path.endswith(".zip") or path.endswith(".jar"):
+    if path.endswith(".jar"):
         zipF = zipfile.ZipFile(path, "r")
         classesList = zipF.namelist()
         zipF.close()
@@ -15,6 +15,18 @@ def get_classes_list(path):
             for filename in files:
                 classesList.append((root + "/" + filename)[len(path):])
         return classesList
+
+def partition_file_paths(file_paths):
+    from_dirs = []
+    from_jars = []
+
+    for path in file_paths:
+        if path.endswith(".jar"):
+            from_jars.append(path)
+        else:
+            from_dirs.append(path)
+
+    return (from_jars, from_dirs)
 
 def has_element(elements, f):
     for e in elements:

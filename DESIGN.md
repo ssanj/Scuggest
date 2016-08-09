@@ -32,3 +32,6 @@
 1. Load classes once per session or until classes list has been updated [x]
 1. externalise min class length
 1. An "explain" mode that explains what classes were consider and which matchers actually matched each one.
+1. Cache files loaded from jars by project.
+1. Always load files from directories.
+1. Clean up cache when closing project.

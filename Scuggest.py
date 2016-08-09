@@ -10,9 +10,10 @@ class ScuggestAddImportCommand(sublime_plugin.TextCommand):
         print("-- ScuggestAddImportCommand -- ")
         project_name = get_project_name(view)
         if (project_name):
-            self.view = view
-            self.classes_list = Momento.classes_list
-            self.path_hash    = Momento.path_hash
+            self.view                = view
+            self.cacheItem           = Momento.get_item(project_name)
+            self.classes_from_jars   = Momento.classes_list
+            self.jar_files_path_hash = Momento.path_hash
         else:
             print("Could not read .sublime-project file." +
                   "\nCreate a project and add your Scuggest settings there." +
@@ -24,10 +25,17 @@ class ScuggestAddImportCommand(sublime_plugin.TextCommand):
     def is_visible(self):
         return is_expected_env(self.view, sublime.version())
 
+    def description(self):
+        return "Adds a Scala import for the type required"
+
+
+    def update_cache(self, classes_from_jars, jar_files_path):
+        self.cacheItem = MomentoItem(self.project_name, classes_from_jars, jar_files_path)
+
     def update_state(self, class_paths, classes_list):
         Momento.set_classes_list(class_paths, classes_list)
-        self.classes_list = Momento.classes_list
-        self.path_hash    = Momento.path_hash
+        self.classes_from_jars = Momento.classes_list
+        self.jar_files_path_hash    = Momento.path_hash
 
     def load_classes(self, classPaths):
         clazzList = []
@@ -49,14 +57,19 @@ class ScuggestAddImportCommand(sublime_plugin.TextCommand):
             sublime.error_message("You must first define at least one \"scuggest_import_path\" in your settings")
             return
 
-        filtered_path = settings.get("scuggest_filtered_path") or []
-        class_paths   = settings.get("scuggest_import_path")
+        filtered_path    = settings.get("scuggest_filtered_path") or []
+        class_file_paths = settings.get("scuggest_import_path")
         print("filtered_path: " + str(filtered_path))
-        print("path_hash: " + str(self.path_hash))
-        if not self.classes_list or self.path_hash != md5(class_paths):
-            self.update_state(class_paths, timed("load_classes")(self.load_classes(class_paths)))
+        print("path_hash: " + str(self.jar_files_path_hash))
+        (jar_files_path, dir_files_path) = partition_file_paths(class_file_paths)
+        print("jar_files_path: " + str(jar_files_path))
+        print("dir_files_path: " + str(dir_files_path))
+        # if cache_item.should_refresh(jar_files_path):
+        # self.update_cache(timed("load_classes")(self.load_classes(jar_files_path)), jar_files_path)
+        if not self.classes_from_jars or self.jar_files_path_hash != md5(class_file_paths):
+            self.update_state(class_file_paths, timed("load_classes")(self.load_classes(class_file_paths)))
 
-        self.process_classes(self.classes_list, filtered_path)
+        self.process_classes(self.classes_from_jars, filtered_path)
 
 
     def process_classes(self, classesList, filtered_path):
