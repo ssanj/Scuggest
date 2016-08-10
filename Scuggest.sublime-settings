@@ -3,6 +3,13 @@
 	// (e.g. "/Library/Java/JavaVirtualMachines/jdk1.8.0_65.jdk/Contents/Home/jre/lib/rt.jar", "/Users/you/.ivy/.cache/path/to/library.jar")
 	"scuggest_import_path": [],
     //path prefixes to filter out
-    //eg. ["com/sun"]
-    "scuggest_filtered_path": []
+    "scuggest_filtered_path":
+    [
+        "com/sun",
+        "sun",
+        "javax/swing",
+        "org/omg",
+        "com/apple",
+        "java/awt"
+    ]
 }

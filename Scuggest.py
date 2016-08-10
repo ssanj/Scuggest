@@ -6,27 +6,11 @@ from .momento import *
 
 class ScuggestAddImportCommand(sublime_plugin.TextCommand):
 
-    def __init__(self, view):
-        print("-- ScuggestAddImportCommand -- ")
-        self.project_name = get_project_name(view)
-        if (self.project_name):
-            self.view                = view
-            self.cache_item          = Momento.get_item(self.project_name)
-        else:
-            self.view = None
-            print("Could not read .sublime-project file." +
-                  "\nCreate a project and add your Scuggest settings there." +
-                  "\nPlease see https://github.com/ssanj/Scuggest for more information.")
-
     def is_enabled(self):
-        return is_expected_env(self.view, sublime.version())
+        return hasattr(self, "view") and is_expected_env(self.view, sublime.version())
 
     def is_visible(self):
-        return is_expected_env(self.view, sublime.version())
-
-    def description(self):
-        return "Adds a Scala import for the type required"
-
+        return hasattr(self, "view") and is_expected_env(self.view, sublime.version())
 
     def update_cache(self, classes_from_jars, jar_files_path):
         mi = MomentoItem(self.project_name, classes_from_jars, jar_files_path)
@@ -34,6 +18,18 @@ class ScuggestAddImportCommand(sublime_plugin.TextCommand):
         self.cache_item = Momento.get_item(self.project_name)
 
     def run(self, edit):
+        print("-- ScuggestAddImportCommand -- ")
+        project_name = get_project_name(self.view)
+        if (project_name):
+            self.project_name = project_name
+            self.cache_item   = Momento.get_item(self.project_name)
+        else:
+            sublime.error_message(
+                "Could not read .sublime-project file." +
+                "\nCreate a project and add your Scuggest settings there." +
+                "\nPlease see https://github.com/ssanj/Scuggest for more information.")
+            return
+
         settings = self.view.settings()
         if not settings.has("scuggest_import_path"):
             settings = sublime.load_settings("Scuggest.sublime-settings")
@@ -47,11 +43,11 @@ class ScuggestAddImportCommand(sublime_plugin.TextCommand):
 
         filtered_path    = settings.get("scuggest_filtered_path") or []
         class_file_paths = settings.get("scuggest_import_path")
-        print("filtered_path: " + str(filtered_path))
-        print("path_hash: " + str(self.cache_item))
+        # print("filtered_path: " + str(filtered_path))
+        # print("path_hash: " + str(self.cache_item))
         (jar_files_path, dir_files_path) = partition_file_paths(class_file_paths)
-        print("jar_files_path: " + str(jar_files_path))
-        print("dir_files_path: " + str(dir_files_path))
+        # print("jar_files_path: " + str(jar_files_path))
+        # print("dir_files_path: " + str(dir_files_path))
 
         if self.cache_item.should_refresh(jar_files_path):
             self.update_cache(timed("load_classes_from_jars")(load_classes(jar_files_path)), jar_files_path)

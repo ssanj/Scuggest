@@ -1,5 +1,5 @@
 [
-    { "caption": "Scuggest: Add Import", "command": "scuggest_add_import" },
+    { "caption": "Scuggest: Add Import",  "command": "scuggest_add_import"  },
     { "caption": "Scuggest: Clear Cache", "command": "scuggest_clear_cache" },
-    { "caption": "Scuggest: Show Cache", "command": "scuggest_show_cache" }
+    { "caption": "Scuggest: Show Cache",  "command": "scuggest_show_cache"  }
 ]

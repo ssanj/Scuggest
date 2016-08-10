@@ -72,17 +72,17 @@ class ScuggestClearCacheCommand(sublime_plugin.TextCommand):
 class ScuggestShowCacheCommand(sublime_plugin.TextCommand):
 
     def is_enabled(self):
-        return is_expected_env(self.view, sublime.version())
+        return hasattr(self, "view") and is_expected_env(self.view, sublime.version())
 
     def is_visible(self):
-        return is_expected_env(self.view, sublime.version())
+        return hasattr(self, "view") and is_expected_env(self.view, sublime.version())
 
     def run(self, edit):
         items = Momento.get_items()
         if (len(items)):
-            print("\nScuggest cache:")
+            print("Scuggest cache:")
             for k in items.keys():
                 mi = items.get(k)
-                print("\n" + str(mi))
+                print(str(mi) + "\n")
         else:
-            print("\nScuggest cache is empty.")
+            print("Scuggest cache is empty.")

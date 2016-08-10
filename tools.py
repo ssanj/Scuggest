@@ -6,15 +6,16 @@ import hashlib
 def get_classes_list(path):
     if path.endswith(".jar"):
         zipF = zipfile.ZipFile(path, "r")
-        classesList = zipF.namelist()
+        classes_list = zipF.namelist()
         zipF.close()
-        return classesList
+        return classes_list
     else:
-        classesList = []
+        classes_list = []
         for root, dirs, files in os.walk(path):
             for filename in files:
-                classesList.append((root + "/" + filename)[len(path):])
-        return classesList
+                classes_list.insert(0, (root + "/" + filename)[len(path):])
+
+        return classes_list
 
 def load_classes(class_paths):
     all_classes = []
