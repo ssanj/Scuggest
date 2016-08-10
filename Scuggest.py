@@ -42,31 +42,29 @@ class ScuggestAddImportCommand(sublime_plugin.TextCommand):
             sublime.error_message("You must first define at least one \"scuggest_import_path\" in your settings")
             return
 
-        filtered_path    = settings.get("scuggest_filtered_path") or []
         class_file_paths = settings.get("scuggest_import_path")
-        # print("filtered_path: " + str(filtered_path))
-        # print("path_hash: " + str(self.cache_item))
-        (jar_files_path, dir_files_path) = partition_file_paths(class_file_paths)
-        # print("jar_files_path: " + str(jar_files_path))
-        # print("dir_files_path: " + str(dir_files_path))
+        filtered_path    = settings.get("scuggest_filtered_path") or []
 
-        if self.cache_item.should_refresh(jar_files_path):
-            self.update_cache(timed("load_classes_from_jars")(
-                self.remove_filtered_classes(
-                    load_classes(jar_files_path), filtered_path)),
-                    jar_files_path)
+        t = ScuggestAddImportThread(self, class_file_paths, filtered_path)
+        t.start()
+        self.handle_thread(t)
 
-        classes_from_dirs = timed("load_classes_from_dirs")(
-                                self.remove_filtered_classes(
-                                    load_classes(dir_files_path), filtered_path))
-
-        self.process_classes(self.cache_item.classes_from_jars + classes_from_dirs, filtered_path)
+    def handle_thread(self, thread, dots = 0):
+        if (thread.is_alive()):
+             dots = (dots + 1) % 5
+             self.view.set_status("scuggest", "Loading imports " + ("." * dots))
+             sublime.set_timeout(lambda: self.handle_thread(thread, dots), 500)
+             return
+        else:
+             self.view.erase_status("scuggest")
+             sublime.status_message("Scuggest: loaded imports")
 
     def remove_filtered_classes(self, classes_list, filtered_path):
         return [cl for cl in classes_list if cl.find("$$anonfun$") == -1 and \
                cl.find("$$anon$") == -1 and \
-               not re.match("^.*\$\d+\.class$", cl) and\
-               not has_element(filtered_path, cl.startswith)]
+               not re.match("^.*\$\d+\.class$", cl) and \
+               not has_element(filtered_path, cl.startswith) and \
+               cl.find("$delayedInit$body") == -1]
 
     def process_classes(self, classesList, filtered_path):
         allEmpty = True
@@ -151,3 +149,25 @@ class ScuggestAddImportInsertCommand(sublime_plugin.TextCommand):
                      importStatementNL = importStatement + "\n\n"
                    self.view.insert(edit, point, importStatementNL)
                    break
+
+class ScuggestAddImportThread(threading.Thread):
+    def __init__(self, command, class_file_paths, filtered_path):
+        self.command          = command
+        self.class_file_paths = class_file_paths
+        self.filtered_path    = filtered_path
+        threading.Thread.__init__(self)
+
+    def run(self):
+        (jar_files_path, dir_files_path) = partition_file_paths(self.class_file_paths)
+
+        if self.command.cache_item.should_refresh(jar_files_path):
+            self.command.update_cache(timed("load_classes_from_jars")(
+                self.command.remove_filtered_classes(
+                    load_classes(jar_files_path), self.filtered_path)),
+                    jar_files_path)
+
+        classes_from_dirs = timed("load_classes_from_dirs")(
+                                self.command.remove_filtered_classes(
+                                    load_classes(dir_files_path), self.filtered_path))
+
+        self.command.process_classes(self.command.cache_item.classes_from_jars + classes_from_dirs, self.filtered_path)
