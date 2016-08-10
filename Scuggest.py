@@ -13,6 +13,7 @@ class ScuggestAddImportCommand(sublime_plugin.TextCommand):
         return hasattr(self, "view") and is_expected_env(self.view, sublime.version())
 
     def update_cache(self, classes_from_jars, jar_files_path):
+        #remove the filtered classes as they are not used in the search
         mi = MomentoItem(self.project_name, classes_from_jars, jar_files_path)
         Momento.set_item(mi)
         self.cache_item = Momento.get_item(self.project_name)
@@ -50,10 +51,22 @@ class ScuggestAddImportCommand(sublime_plugin.TextCommand):
         # print("dir_files_path: " + str(dir_files_path))
 
         if self.cache_item.should_refresh(jar_files_path):
-            self.update_cache(timed("load_classes_from_jars")(load_classes(jar_files_path)), jar_files_path)
+            self.update_cache(timed("load_classes_from_jars")(
+                self.remove_filtered_classes(
+                    load_classes(jar_files_path), filtered_path)),
+                    jar_files_path)
 
-        classes_from_dirs = timed("load_classes_from_dirs")(load_classes(dir_files_path))
+        classes_from_dirs = timed("load_classes_from_dirs")(
+                                self.remove_filtered_classes(
+                                    load_classes(dir_files_path), filtered_path))
+
         self.process_classes(self.cache_item.classes_from_jars + classes_from_dirs, filtered_path)
+
+    def remove_filtered_classes(self, classes_list, filtered_path):
+        return [cl for cl in classes_list if cl.find("$$anonfun$") == -1 and \
+               cl.find("$$anon$") == -1 and \
+               not re.match("^.*\$\d+\.class$", cl) and\
+               not has_element(filtered_path, cl.startswith)]
 
     def process_classes(self, classesList, filtered_path):
         allEmpty = True
@@ -87,13 +100,6 @@ class ScuggestAddImportCommand(sublime_plugin.TextCommand):
         print("classesList: " + str(len(classesList)))
         count = 0
         for name in classesList:
-            #skip classes created for functions
-            if(name.find("$$anonfun$") != -1 or \
-               name.find("$$anon$") != -1 or \
-               re.match("^.*\$\d+\.class$", name) or\
-               has_element(filtered_path, name.startswith)):
-                continue
-
             count = count + 1
             for m in matches:
                 if (m.does_match(name, userSelection)):
