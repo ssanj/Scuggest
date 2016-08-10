@@ -29,7 +29,9 @@ class ScuggestAddImportCommand(sublime_plugin.TextCommand):
 
 
     def update_cache(self, classes_from_jars, jar_files_path):
-        self.cache_item = MomentoItem(self.project_name, classes_from_jars, jar_files_path)
+        mi = MomentoItem(self.project_name, classes_from_jars, jar_files_path)
+        Momento.set_item(mi)
+        self.cache_item = Momento.get_item(self.project_name)
 
     def run(self, edit):
         settings = self.view.settings()

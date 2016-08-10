@@ -17,12 +17,11 @@ def get_classes_list(path):
         return classesList
 
 def load_classes(class_paths):
-    clazzList = []
+    all_classes = []
     for path in class_paths:
-        clazzList = clazzList + get_classes_list(path)
-        clazzList = list(map(lambda x: x.replace("\\", "/"), clazzList))
+        all_classes.insert(0, get_classes_list(path))
 
-    return clazzList
+    return [clzz.replace("\\", "/") for class_list in all_classes for clzz in class_list]
 
 def partition_file_paths(file_paths):
     from_dirs = []
