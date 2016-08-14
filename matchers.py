@@ -40,7 +40,7 @@ class EndsWithObjectMatcher:
         result = filename.replace("/", ".").replace("$", ".").replace(".class", "")
         Results.add(results, result)
 
-# example: /com/sun/corba/se/spi/orbutil/threadpool/NoSuchWorkQueueException
+# example: /com/sun/corba/se/spi/orbutil/threadpool/NoSuchWorkQueueException.class
 # search: *Work*
 class ContainsMatcher:
 
