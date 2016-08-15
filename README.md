@@ -27,7 +27,7 @@ Here are a few ways to install Scuggest on your system.
 Configuration
 --------------
 
-To use Scuggest, you need to have a project file (.sublime-project) created for your Scala project. You can do this for an existing project by clicking on the __Project__ > __Save Project As ...__ menu item and saving the project to the root of your Scala project directory.
+To use Scuggest, you need to have a project file (.sublime-project) created for your Scala project. You can do this for an existing project by clicking on the __Project__ > __Save Project As ...__ menu item and saving the project to the root of your Scala project directory (usually where your build.sbt file lives).
 
 Once you have a project created, here is an example settings element:
 
@@ -69,49 +69,53 @@ You can use Scuggest in the following ways:
 
 2. If you press __CMD + ALT + I__ on an empty line then a search box will be displayed allowing you to enter the class name or a wildcard to match on.
 
-![Scuggest importing a class](scuggest_wildcard_import_720.mov.gif)
+![Scuggest wildcard suffix importing a class](scuggest_wildcard_import_720.mov.gif)
 
 3. If you press __SHIFT+CMD + ALT + I__ anywhere, even within a selection, a search box will be displayed allowing you to enter the class name or a wildcard to match on.
+
+![Scuggest wildcard prefix](scuggest_wildcard_prefix_import_720.mov.gif)
 
 Selection Matchers
 ------------------
 
+Scuggest uses a variety of matching strategies to find the class you select.
+
 ### 1. Class name ###
 
-This is the first matcher that is tried against a selection. It attempts to find classes that ends with the search term supplied.
-_NB_ A selection is converted to a search term. The actual matching is done against the search terms.
+This is the first matcher that is tried against a selection. It attempts to find classes that _ends with_ the search term supplied.
+__NB__ _A selection is converted to a search term. The actual matching is done against the search terms_.
 
 ```
-# example class: net.ssanj.dabble.ResolverParser.class
+# example class: net.ssanj.dabble.ResolverParser
 # search term: ResolverParser
 # matched: true
 ```
 
 ```
-# example class: net.ssanj.dabble.DabbleWorkPath.class
+# example class: net.ssanj.dabble.DabbleWorkPath
 # search term: ResolverParser
 # matched: false
 ```
 
 ```
-# example class: net.ssanj.dabble.ResolverParser.class
+# example class: net.ssanj.dabble.ResolverParser
 # search term: ResolverPars
 # matched: false
 ```
 
 ### 2. Object name ###
 
-This is similar to the __Ends with class name__ matcher but only matches objects that end with search term.
+This is similar to the __Class name__ matcher but only matches objects that _end with__ the search term.
 
 ```
-# example: net.ssanj.dabble.DabblePathTypes$DabbleWorkPath$.class
+# example: net.ssanj.dabble.DabblePathTypes$DabbleWorkPath$
 # search term: DabbleWorkPath
 # match: true
 ```
 
 ### 3. Object with subtype(s) ###
 
-Matches a search term against and object that defines other types (classes, traits or other objects)
+Matches a search term against an object that defines other types (classes, traits or other objects)
 
 ```
 # example: net.ssanj.dabble.DabblePathTypes.DabbleWorkPath.NestedDabbleWorkPath.MoreNestedDabbleWorkPath
@@ -170,3 +174,16 @@ Matches the supplied search term anywhere in the class name. The search term sho
 #  java.util.concurrent.ForkJoinPool.DefaultForkJoinWorkerThreadFactory
 
 ```
+
+Caching
+-------
+
+Scuggest tries to cache your files in the most non-intrusive way possible. The contents of any jar files specified in the __scuggest_import_path__ is cache until the __scuggest_import_path__ is modified by adding, deleting or modifying a jar path. Directory paths specified in __scuggest_import_path__ are always read each time in order to index any new files that could be added.
+
+You can display the cache by running the "Scuggest: Show Cache" command from the command palette (__CMD + P__). This outputs the project location along with the number of classes cached for that project to the console (__CTRL + `__).
+```
+Scuggest cache:
+/Volumes/Work/projects/code/scala/toy/dabble/dabble.sublime-project : 9992
+```
+
+You can also clear the full cache for all projects by running the "Scuggest: Clear Cache" command from the command palette. This will mean that the cache will have to be recreated on the next import call.
