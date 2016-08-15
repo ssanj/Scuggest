@@ -76,7 +76,7 @@ You can use Scuggest in the following ways:
 Selection Matchers
 ------------------
 
-### 1. class name ###
+### 1. Class name ###
 
 This is the first matcher that is tried against a selection. It attempts to find classes that ends with the search term supplied.
 _NB_ A selection is converted to a search term. The actual matching is done against the search terms.
