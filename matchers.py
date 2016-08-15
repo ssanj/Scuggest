@@ -10,7 +10,8 @@ class Results:
         if result.endswith("."):
             result = result[:-1]
 
-        results.append(result)
+        #remove `package` from package path.
+        results.append(result.replace(".package", ""))
 
 # example: /net/ssanj/dabble/ResolverParser.class
 # search: ResolverParser

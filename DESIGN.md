@@ -38,6 +38,6 @@
 1. Add threading support [x]
 1. Command to show cache name and class counts (can't display contents as it is in the 1000s). [x]
 1. Command to clear cache. [x]
-1. Remove "package" prefix from package classes.
+1. Remove "package" prefix from package classes. [x]
 1. Remove $delayedInit$body from scanned list (filter out) [x]
 1. Add a command to directly show input box irrespective of selection

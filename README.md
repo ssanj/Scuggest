@@ -67,9 +67,7 @@ You can use Scuggest in the following ways:
 
 ![Scuggest importing a class](scuggest_import_720.mov.gif)
 
-2. You can also manually select multiple class names and then press __ALT + CMD + I__ to import them all. You will be given a list of matches for each selection.
-
-3. If you press __ALT + CMD + I__ on an empty line then a search box will be displayed allowing you to enter the class name or a wildcard to match on.
+2. If you press __ALT + CMD + I__ on an empty line then a search box will be displayed allowing you to enter the class name or a wildcard to match on.
 
 ![Scuggest importing a class](scuggest_wildcard_import_720.mov.gif)
 

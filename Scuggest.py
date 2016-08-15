@@ -67,7 +67,6 @@ class ScuggestAddImportCommand(sublime_plugin.TextCommand):
                cl.find("$delayedInit$body") == -1]
 
     def process_classes(self, classesList, filtered_path):
-        allEmpty = True
         for sel in self.view.sel():
             if sel.empty():
                 wordSel     = self.view.word(sel)
@@ -80,11 +79,9 @@ class ScuggestAddImportCommand(sublime_plugin.TextCommand):
 
             userSelection = self.view.substr(sel)
             self.process_classes_in_ui(classesList, filtered_path)(userSelection)
+            return
 
-            allEmpty = False
-
-        if allEmpty:
-            self.view.window().show_input_panel("Class name: ", "", self.process_classes_in_ui(classesList, filtered_path), None, None)
+        self.view.window().show_input_panel("Class name: ", "", self.process_classes_in_ui(classesList, filtered_path), None, None)
 
     def match_selection(self, classesList, filtered_path, userSelection):
         results = []
@@ -171,3 +168,4 @@ class ScuggestAddImportThread(threading.Thread):
                                     load_classes(dir_files_path), self.filtered_path))
 
         self.command.process_classes(self.command.cache_item.classes_from_jars + classes_from_dirs, self.filtered_path)
+
