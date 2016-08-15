@@ -1,3 +1,4 @@
 [
-	{ "keys": ["super+alt+i"], "command": "scuggest_add_import"}
+    { "keys": ["super+alt+i"], "command": "scuggest_add_import"},
+	{ "keys": ["super+shift+alt+i"], "command": "scuggest_search_term_add_import"}
 ]

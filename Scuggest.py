@@ -45,6 +45,9 @@ class ScuggestAddImportCommand(sublime_plugin.TextCommand):
         class_file_paths = settings.get("scuggest_import_path")
         filtered_path    = settings.get("scuggest_filtered_path") or []
 
+        self.execute_command(class_file_paths, filtered_path)
+
+    def execute_command(self, class_file_paths, filtered_path):
         t = ScuggestAddImportThread(self, class_file_paths, filtered_path)
         t.start()
         self.handle_thread(t)
@@ -147,12 +150,21 @@ class ScuggestAddImportInsertCommand(sublime_plugin.TextCommand):
                    self.view.insert(edit, point, importStatementNL)
                    break
 
+class ScuggestSearchTermAddImportCommand(ScuggestAddImportCommand):
+    def execute_command(self, class_file_paths, filtered_path):
+        t = ScuggestSearchTermAddImportThread(self, class_file_paths, filtered_path)
+        t.start()
+        self.handle_thread(t)
+
 class ScuggestAddImportThread(threading.Thread):
     def __init__(self, command, class_file_paths, filtered_path):
         self.command          = command
         self.class_file_paths = class_file_paths
         self.filtered_path    = filtered_path
         threading.Thread.__init__(self)
+
+    def execute(self, classes_list):
+        self.command.process_classes(classes_list, self.filtered_path)
 
     def run(self):
         (jar_files_path, dir_files_path) = partition_file_paths(self.class_file_paths)
@@ -167,5 +179,11 @@ class ScuggestAddImportThread(threading.Thread):
                                 self.command.remove_filtered_classes(
                                     load_classes(dir_files_path), self.filtered_path))
 
-        self.command.process_classes(self.command.cache_item.classes_from_jars + classes_from_dirs, self.filtered_path)
+        self.execute(self.command.cache_item.classes_from_jars + classes_from_dirs)
 
+class ScuggestSearchTermAddImportThread(ScuggestAddImportThread):
+    def __init__(self, command, class_file_paths, filtered_path):
+        super(ScuggestSearchTermAddImportThread, self).__init__(command, class_file_paths, filtered_path)
+
+    def execute(self, classes_list):
+        self.command.view.window().show_input_panel("Class name: ", "", self.command.process_classes_in_ui(classes_list, self.filtered_path), None, None)
