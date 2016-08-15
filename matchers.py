@@ -11,7 +11,14 @@ class Results:
             result = result[:-1]
 
         #remove `package` from package path.
-        results.append(result.replace(".package", ""))
+        result = result.replace(".package", "")
+
+        #remove any duplicate dots.
+        #eg. path/$blah -> path..blah
+        result = re.sub("(\.){2,}", ".", result)
+        # result = result.replace("..", "")
+
+        results.append(result)
 
 # example: /net/ssanj/dabble/ResolverParser.class
 # search: ResolverParser

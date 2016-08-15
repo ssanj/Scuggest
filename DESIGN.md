@@ -40,4 +40,4 @@
 1. Command to clear cache. [x]
 1. Remove "package" prefix from package classes. [x]
 1. Remove $delayedInit$body from scanned list (filter out) [x]
-1. Add a command to directly show input box irrespective of selection
+1. Add a command to directly show input box irrespective of selection [x]

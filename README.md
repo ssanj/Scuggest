@@ -63,13 +63,15 @@ Usage
 
 You can use Scuggest in the following ways:
 
-1. Click on the name of a class that you want to import into your Scala source file and press __ALT + CMD + I__. This will select the word under the cursor and attempt to display any matched classes.
+1. Click on the name of a class that you want to import into your Scala source file and press __CMD + ALT + I__. This will select the word under the cursor and attempt to display any matched classes.
 
 ![Scuggest importing a class](scuggest_import_720.mov.gif)
 
-2. If you press __ALT + CMD + I__ on an empty line then a search box will be displayed allowing you to enter the class name or a wildcard to match on.
+2. If you press __CMD + ALT + I__ on an empty line then a search box will be displayed allowing you to enter the class name or a wildcard to match on.
 
 ![Scuggest importing a class](scuggest_wildcard_import_720.mov.gif)
+
+3. If you press __SHIFT+CMD + ALT + I__ anywhere, even within a selection, a search box will be displayed allowing you to enter the class name or a wildcard to match on.
 
 Selection Matchers
 ------------------
