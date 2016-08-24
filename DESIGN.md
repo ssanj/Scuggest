@@ -41,3 +41,24 @@
 1. Remove "package" prefix from package classes. [x]
 1. Remove $delayedInit$body from scanned list (filter out) [x]
 1. Add a command to directly show input box irrespective of selection [x]
+1. Support special class names:
+  {
+    "$" : '$',
+    "$tilde" : '~',
+    "$eq" : '=',
+    "$less" : '<',
+    "$greater" : '>',
+    "$bang" : '!',
+    "$hash" : '#',
+    "$percent" : '%',
+    "$up" : '^',
+    "$amp" : '&',
+    "$bar" : '|',
+    "$times" : '*',
+    "$div" : '/',
+     "$bslash" : '\\,
+    "$plus" : '+',
+    "$minus" : '-',
+    "$colon" : ':'
+  }
+1. Use a Map instead of a linear search

@@ -3,6 +3,8 @@ import os
 import re
 
 class Results:
+    extra_dots = re.compile("(\.){2,}")
+
     @classmethod
     def add(self, results, result):
         if result.startswith("."):
@@ -15,7 +17,7 @@ class Results:
 
         #remove any duplicate dots.
         #eg. path/$blah -> path..blah
-        result = re.sub("(\.){2,}", ".", result)
+        result = re.sub(Results.extra_dots, ".", result)
         # result = result.replace("..", "")
 
         results.append(result)

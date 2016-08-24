@@ -27,6 +27,12 @@ Here are a few ways to install Scuggest on your system.
 Configuration
 --------------
 
+### Using SBT
+
+Run [sbt-scuggest](https://github.com/ssanj/sbt-scuggest) to generate all your basic configuration and update (or generate) your project file.
+
+### Manually
+
 To use Scuggest, you need to have a project file (.sublime-project) created for your Scala project. You can do this for an existing project by clicking on the __Project__ > __Save Project As ...__ menu item and saving the project to the root of your Scala project directory (usually where your build.sbt file lives).
 
 Once you have a project created, here is an example settings element:
