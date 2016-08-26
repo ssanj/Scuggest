@@ -1,7 +1,7 @@
 Scuggest
 ========
 
-Scuggest (pronounced 'Suggest') is a Sublime Text plugin for automatically adding imports to your Scala files. It resolves the class names by scanning through a provided list of jar or class directories.
+Scuggest (pronounced 'Suggest') is a Sublime Text plugin for automatically adding imports to your Scala files. It resolves the imports by scanning through a provided list of jars and class directories.
 
 Scuggest was initially based on [JavaImports](https://github.com/MDeiml/SublimeJavaImports) but now works in a completely different way.
 
@@ -10,13 +10,13 @@ Installation
 
 Here are a few ways to install Scuggest on your system.
 
-1. The easiest way to install Scuggest is through [Package Control](https://packagecontrol.io/packages/Scuggest).
+Although [Scuggest has been submitted to Package Control](https://github.com/wbond/package_control_channel/pull/5754), it still hasn't been merged. Until then please use one of the solutions outlined below. Once it has been merged, please install it directly through [Package Control](https://packagecontrol.io/packages/Scuggest).
 
-2. Git clone the Scuggest repository into your Packages directory:
+1. Git clone the Scuggest repository into your Packages directory:
 
-```git clone git@github.com:ssanj/Scuggest.git```
+    ```git clone git@github.com:ssanj/Scuggest.git```
 
-3. Download the [latest release](https://github.com/ssanj/Scuggest/releases) source code and extract it to the Packages directory.
+2. Download the [latest release](https://github.com/ssanj/Scuggest/releases) source code and extract it to the Packages directory.
 
 > The Packages directory is located at:
 
@@ -35,7 +35,7 @@ Run [sbt-scuggest](https://github.com/ssanj/sbt-scuggest) to generate all your b
 
 To use Scuggest, you need to have a project file (.sublime-project) created for your Scala project. You can do this for an existing project by clicking on the __Project__ > __Save Project As ...__ menu item and saving the project to the root of your Scala project directory (usually where your build.sbt file lives).
 
-Once you have a project created, here is an example settings element:
+Once you have a project created, use the settings element below and customise the __scuggest_import_path__ and __scuggest_filtered_path__ to suite your needs.
 
 ```javascript
 "settings": {
@@ -62,7 +62,7 @@ Once you have a project created, here is an example settings element:
 
 __scuggest_import_path__ lists the jar files you want Scuggest to look for classes in. This can include either Java or Scala jar files. Some typical jars to include are the Java rt.jar file and the scala-library-scala-version.jar file. You can add as many or as few libraries that you want searched here.
 
-__scuggest_filtered_path__ lists the path prefixes that are skipped when scanning for a target class. A typical example could be anything under the com/sun package. Notice that these are file path as opposed to package (or dotted) paths.
+__scuggest_filtered_path__ lists the path prefixes that are skipped when scanning for a target class. A typical example could be anything under the com/sun package. Notice that these are file paths as opposed to package (or dotted) paths.
 
 Usage
 -----
@@ -88,7 +88,7 @@ Scuggest uses a variety of matching strategies to find the class you select.
 
 ### 1. Class name ###
 
-This is the first matcher that is tried against a selection. It attempts to find classes that _ends with_ the search term supplied.
+This is the first matcher that is tried against a selection. It attempts to find classes that _end with_ the search term supplied.
 __NB__ _A selection is converted to a search term. The actual matching is done against the search terms_.
 
 ```
@@ -111,7 +111,7 @@ __NB__ _A selection is converted to a search term. The actual matching is done a
 
 ### 2. Object name ###
 
-This is similar to the __Class name__ matcher but only matches objects that _end with__ the search term.
+This is similar to the __Class name__ matcher but only matches objects that _end with_ the search term. Object class names end with a _$_.
 
 ```
 # example: net.ssanj.dabble.DabblePathTypes$DabbleWorkPath$
@@ -184,7 +184,7 @@ Matches the supplied search term anywhere in the class name. The search term sho
 Caching
 -------
 
-Scuggest tries to cache your files in the most non-intrusive way possible. The contents of any jar files specified in the __scuggest_import_path__ is cache until the __scuggest_import_path__ is modified by adding, deleting or modifying a jar path. Directory paths specified in __scuggest_import_path__ are always read each time in order to index any new files that could be added.
+Scuggest tries to cache your files in the most non-intrusive way possible. The contents of any jar files specified in the __scuggest_import_path__ is cached until the __scuggest_import_path__ is modified by adding, deleting or modifying a jar path. Directory paths specified in __scuggest_import_path__ are always read each time in order to index any new files that could be added.
 
 You can display the cache by running the "Scuggest: Show Cache" command from the command palette (__CMD + P__). This outputs the project location along with the number of classes cached for that project to the console (__CTRL + `__).
 ```
