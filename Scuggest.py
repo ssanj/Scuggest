@@ -3,6 +3,7 @@ import re
 from .matchers import *
 from .tools import *
 from .momento import *
+from .inserts import *
 
 class ScuggestAddImportCommand(sublime_plugin.TextCommand):
 
@@ -134,21 +135,10 @@ class ScuggestAddImportInsertCommand(sublime_plugin.TextCommand):
             region = self.view.line(point)
             line = self.view.substr(region)
 
-            # if not a single comment, block comment, package or package object or an empty line
-            # then insert import at the next line which should be some valid construct.
-            if not re.match("^[\s\t]*\/\*\*?[\s\t]*.*$", line) and \
-               not re.match("^[\s\t]*\/\/.*$",  line) and \
-               not re.match("^[\s\t]*package[\s\t]+(?:object)?(?:[\s\t]+)?[a-zA-Z][a-zA-Z0-9]+(?:\.(?:[a-zA-Z][a-zA-Z0-9]+))*$", line) and \
-               not re.match("^[\s\t]*$", line):
-                   importStatement = "import " + classpath
-                   #if the previous line is also an import then just add above
-                   #if not then add an extra line to separate the import block
-                   if re.match("^[\s\t]*import[\s\t]+.*$", line):
-                     importStatementNL = importStatement + "\n"
-                   else:
-                     importStatementNL = importStatement + "\n\n"
-                   self.view.insert(edit, point, importStatementNL)
-                   break
+            importStatementNL = get_import_statement(classpath, line)
+            if importStatementNL:
+                self.view.insert(edit, point, importStatementNL)
+                break
 
 class ScuggestSearchTermAddImportCommand(ScuggestAddImportCommand):
     def execute_command(self, class_file_paths, filtered_path):
