@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/ssanj/Scuggest.svg?branch=master)](https://travis-ci.org/ssanj/Scuggest)
+
 Scuggest
 ========
 
