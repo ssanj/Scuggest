@@ -10,13 +10,13 @@ Installation
 
 Here are a few ways to install Scuggest on your system.
 
-Although [Scuggest has been submitted to Package Control](https://github.com/wbond/package_control_channel/pull/5754), it still hasn't been merged. Until then please use one of the solutions outlined below. Once it has been merged, please install it directly through [Package Control](https://packagecontrol.io/packages/Scuggest).
+1. Install it directly through [Package Control](https://packagecontrol.io/packages/Scuggest).
 
-1. Git clone the Scuggest repository into your Packages directory:
+2. Git clone the Scuggest repository into your Packages directory:
 
     ```git clone git@github.com:ssanj/Scuggest.git```
 
-2. Download the [latest release](https://github.com/ssanj/Scuggest/releases) source code and extract it to the Packages directory.
+3. Download the [latest release](https://github.com/ssanj/Scuggest/releases) source code and extract it to the Packages directory.
 
 > The Packages directory is located at:
 

@@ -6,19 +6,14 @@ def get_import_statement(classpath, line):
        not re.match("^[\s\t]*$", line):
        importStatement = "import " + classpath
 
-       # If it's a documentation line, then add the import
-       #above it and add an extra newline for spacing.
-       # if re.match("^[\s\t]*\/\*\*?[\s\t]*.*$", line) or \
-       #    re.match("^[\s\t]*\*[\s\t]*.*$", line) or \
-       #    re.match("^[\s\t]*\/\/.*$",  line):
-       #     importStatementNL = importStatement + "\n\n"
+       # if it's an import line, then add this import above it.
        if re.match("^[\s\t]*import[\s\t]+.*$", line):
-         # if it's an import line, then add this import above it
          importStatementNL = importStatement + "\n"
        else:
-         # It's not documentation, an empty line or an import;
-         # for everything else add the import and two newlines to
-         # for some line spacing.
+         # It's not a package or an empty line or an import.
+         # For everything else add the import and two newlines
+         # for some line spacing, between the import and whatever
+         # comes next.
          importStatementNL = importStatement + "\n\n"
 
        return importStatementNL
