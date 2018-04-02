@@ -83,6 +83,15 @@ You can use Scuggest in the following ways:
 
 ![Scuggest wildcard prefix](scuggest_wildcard_prefix_import_720.mov.gif)
 
+Importing Source Classes
+------------------------
+
+Scuggests works by inspecting jar files in your __scuggest_import_path__ and class files in your __target__ directory. This means that to for Scuggest to work with your source classes, they need to have been compiled. A recommended workflow is to use SBT with continuous compilation to ensure all sources are compiled and thus accessible by Scuggest:
+
+```
+sbt ~test:compile
+```
+
 Selection Matchers
 ------------------
 
